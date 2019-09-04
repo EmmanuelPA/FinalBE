@@ -16,3 +16,14 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+# routes/api.php
+
+Route::get('/greeting', function (Request $request){
+    return '';
+});
+
+# routes/api.php
+
+Route::get('/greeting', function (Request $request){
+    return 'Hello World!';
+});
