@@ -100,7 +100,7 @@ class ProductController extends Controller
          $datosEmpleado = request()->except(['_token', '_method']);
         Product::where('id', "=", $id)->update($datosEmpleado);
                 $producto = Product::findOrFail($id);
-         return response()->json($producto,200);
+         return response()->json($producto,201);
         return view('editProd', compact('producto'));
         //
     }
@@ -115,6 +115,7 @@ class ProductController extends Controller
     {
         //
         Product::destroy($id);
+        return response()->json(200);
         return redirect('/');
     }
 }
