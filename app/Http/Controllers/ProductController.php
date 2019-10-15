@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Product;
 use Illuminate\Http\Request;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 class ProductController extends Controller
 {
     /**
@@ -29,6 +29,7 @@ class ProductController extends Controller
     public function showAll(Product $product)
     {
         return $product->all();
+
     }
     
     /**
@@ -50,13 +51,33 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        if(is_null($request->name)){
+                return response()->json([
+               "errors"=> ["code"=> "ERROR-1",
+               "title"=>  "Unprocessable Entity",
+               ]]  , 422);
+        } elseif (is_null($request->price)) {
+                 return response()->json([
+                 "errors"=> ["code"=> "ERROR-1",
+                 "title"=>  "Unprocessable Entity",
+                 ]]  , 422);
+        } elseif (!(is_numeric($request->price))) {
+              return response()->json([
+                   "errors"=> ["code"=> "ERROR-1",
+                   "title"=>  "Unprocessable Entity",
+                   ]]  , 422);
+        }elseif (($request->price)<=0) {
+                      return response()->json([
+                           "errors"=> ["code"=> "ERROR-1",
+                           "title"=>  "Unprocessable Entity",
+                           ]]  , 422);
+                }else {
+                    //$datosEmpleado = request()->all();
+                   $datosEmpleado = Product::create(request()->all());
+                     // Product::insert($datosEmpleado);
+                     return response()->json($datosEmpleado,201);
+                }
         
-        //$datosEmpleado = request()->all();
-        $datosEmpleado = Product::create(request()->all());
-       // Product::insert($datosEmpleado);
-        return response()->json($datosEmpleado,201);
-        
-      //  return redirect('/');
     }
 
     /**
@@ -68,9 +89,16 @@ class ProductController extends Controller
     public function show($id)
     {
         //  public function show($id)
+       if (!(Product::find($id))) {
+        return response()->json([
+             "errors"=> ["code"=> "ERROR-2",
+             "title"=>  "Not found"
+             ]]  , 404);
+        }else{
 
         $producto = Product::findOrFail($id);
         return response()->json($producto, 200);
+}
     
     }
 
@@ -96,13 +124,30 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+        if (!(is_numeric($request->price))) {
+              return response()->json([
+                   "errors"=> ["code"=> "ERROR-1",
+                   "title"=>  "Unprocessable Entity",
+                   ]]  , 422);
+        }elseif (($request->price)<=0) {
+                      return response()->json([
+                           "errors"=> ["code"=> "ERROR-1",
+                           "title"=>  "Unprocessable Entity",
+                           ]]  , 422);
+                } elseif (!(Product::find($id))) {
+        return response()->json([
+             "errors"=> ["code"=> "ERROR-2",
+             "title"=>  "Not found",
+             ]]  , 404);
+        } else {
+
          $datosEmpleado = request()->except(['_token', '_method']);
         Product::where('id', "=", $id)->update($datosEmpleado);
                 $producto = Product::findOrFail($id);
          return response()->json($producto,201);
         return view('editProd', compact('producto'));
-        //
+                }
+        
     }
 
     /**
@@ -114,8 +159,17 @@ class ProductController extends Controller
     public function destroy($id)
     {
         //
+           if (!(Product::find($id))) {
+        return response()->json([
+             "errors"=> ["code"=> "ERROR-2",
+             "title"=>  "Not found"
+             
+             ]]  , 404);
+        } else{
+
         Product::destroy($id);
         return response()->json(200);
         return redirect('/');
     }
+        }
 }
