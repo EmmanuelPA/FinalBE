@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Product;
+use App\Http\Resources\Product as ProductResource;
+use App\Http\Resources\ProductCollection;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -28,7 +30,8 @@ class ProductController extends Controller
      */
     public function showAll(Product $product)
     {
-        return $product->all();
+        $products = ProductResource::collection(Product::all());
+        return $products;
     }
     
     /**
@@ -51,12 +54,13 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         
-        //$datosEmpleado = request()->all();
-        $datosEmpleado = Product::create(request()->all());
-       // Product::insert($datosEmpleado);
-        return response()->json($datosEmpleado,201);
         
-      //  return redirect('/');
+        $product = new ProductResource(Product::create([
+            "name" => $request->input('name'),
+            "price" => $request->input('price')
+        ]));
+       
+        return $product;
     }
 
     /**
@@ -65,12 +69,11 @@ class ProductController extends Controller
      * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Product $product)
     {
         //  public function show($id)
 
-        $producto = Product::findOrFail($id);
-        return response()->json($producto, 200);
+        return new ProductResource($product);
     
     }
 
@@ -94,15 +97,17 @@ class ProductController extends Controller
      * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Product $product)
     {
+        $product->fill([
+            "name" => $request->input('name'),
+            "price" => $request->input('price')
+        ]);
+        $product->save();
+        return new ProductResource($product);
+       
+       // return view('editProd', compact('producto'));
         
-         $datosEmpleado = request()->except(['_token', '_method']);
-        Product::where('id', "=", $id)->update($datosEmpleado);
-                $producto = Product::findOrFail($id);
-         return response()->json($producto,201);
-        return view('editProd', compact('producto'));
-        //
     }
 
     /**
@@ -111,11 +116,13 @@ class ProductController extends Controller
      * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Product $id, $identificador)
     {
         //
-        Product::destroy($id);
-        return response()->json(200);
-        return redirect('/');
+        $id->delete();
+        Product::destroy($identificador);
+        return new ProductResource($id);
+        //return response()->json(200);
+        //return redirect('/');
     }
 }
