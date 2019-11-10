@@ -28,12 +28,12 @@ Route::get('/greeting', function (Request $request){
     return 'Hello World!';
 });
 
-Route::post('/products', 'ProductController@store');
+Route::post('/products', 'ProductController@store')->name("product.store");
 
 Route::put('/products/{id}', "ProductController@update");
 
 Route::delete('/products/{id}', "ProductController@destroy");
 
-Route::get('/products/{id}', "ProductController@show");
+Route::get('/products/{id}', "ProductController@show")->name("product.show");
 
 Route::get('/products', 'ProductController@showAll');

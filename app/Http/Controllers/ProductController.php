@@ -53,11 +53,12 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        
+        $nombre = $request->data["attributes"]["name"];
+        $precio = $request->data["attributes"]["price"];
         
         $product = new ProductResource(Product::create([
-            "name" => $request->input('name'),
-            "price" => $request->input('price')
+            "name" => $nombre,
+            "price" => $precio
         ]));
        
         return $product;
@@ -69,11 +70,11 @@ class ProductController extends Controller
      * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function show(Product $product)
+    public function show($product)
     {
         //  public function show($id)
 
-        return new ProductResource($product);
+       return new ProductResource(Product::findOrFail($product), 200);
     
     }
 
@@ -97,17 +98,19 @@ class ProductController extends Controller
      * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $product)
     {
-        $product->fill([
-            "name" => $request->input('name'),
-            "price" => $request->input('price')
-        ]);
-        $product->save();
-        return new ProductResource($product);
+        $update = Product::findOrFail($product);
+        $nombre = $request->data["attributes"]["name"];
+        $precio = $request->data["attributes"]["price"];
        
-       // return view('editProd', compact('producto'));
-        
+        $update->name = $nombre;
+        $update->price = $precio;
+        $update->save();
+        return new ProductResource(Product::findOrFail($id), 200);
+       
+     
+
     }
 
     /**
@@ -116,12 +119,12 @@ class ProductController extends Controller
      * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $id, $identificador)
+    public function destroy($identificador)
     {
         //
-        $id->delete();
-        Product::destroy($identificador);
-        return new ProductResource($id);
+        $request = Product::findOrFail($identificador);
+        $delete = Product::destroy($identificador);
+        return response()->json(200);
         //return response()->json(200);
         //return redirect('/');
     }
