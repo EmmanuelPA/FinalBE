@@ -52,16 +52,43 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    {   
+        $type = $request->data["type"];
         $nombre = $request->data["attributes"]["name"];
         $precio = $request->data["attributes"]["price"];
         
+        if(is_null($nombre)){
+                return response()->json([
+               "errors"=> ["code"=> "ERROR-1",
+               "title"=>  "Unprocessable Entity",
+               ]]  , 422);
+        } elseif(is_null($precio)){
+                return response()->json([
+                 "errors"=> ["code"=> "ERROR-1",
+                 "title"=>  "Unprocessable Entity",
+                 ]]  , 422);
+        }elseif(!(is_numeric($precio))){
+              return response()->json([
+                   "errors"=> ["code"=> "ERROR-1",
+                   "title"=>  "Unprocessable Entity",
+                   ]]  , 422);
+        }elseif($precio<=0){
+                return response()->json([
+                           "errors"=> ["code"=> "ERROR-1",
+                           "title"=>  "Unprocessable Entity",
+                           ]]  , 422);
+        }
+        else{
+
         $product = new ProductResource(Product::create([
+
             "name" => $nombre,
             "price" => $precio
         ]));
        
         return $product;
+        }
+    
     }
 
     /**
@@ -73,8 +100,14 @@ class ProductController extends Controller
     public function show($product)
     {
         //  public function show($id)
-
+   if (!(Product::find($product))) {
+        return response()->json([
+             "errors"=> ["code"=> "ERROR-2",
+             "title"=>  "Not found"
+             ]]  , 404);
+        }else{
        return new ProductResource(Product::findOrFail($product), 200);
+   }
     
     }
 
@@ -100,16 +133,33 @@ class ProductController extends Controller
      */
     public function update(Request $request, $product)
     {
-        $update = Product::findOrFail($product);
+        
         $nombre = $request->data["attributes"]["name"];
         $precio = $request->data["attributes"]["price"];
        
+        if (!(is_numeric($precio))) {
+              return response()->json([
+                   "errors"=> ["code"=> "ERROR-1",
+                   "title"=>  "Unprocessable Entity",
+                   ]]  , 422);
+        }elseif (($precio)<=0) {
+                      return response()->json([
+                           "errors"=> ["code"=> "ERROR-1",
+                           "title"=>  "Unprocessable Entity",
+                           ]]  , 422);
+                } elseif (!(Product::find($product))) {
+        return response()->json([
+             "errors"=> ["code"=> "ERROR-2",
+             "title"=>  "Not found",
+             ]]  , 404);
+        } else {
+        $update = Product::findOrFail($product);
         $update->name = $nombre;
         $update->price = $precio;
         $update->save();
         return new ProductResource(Product::findOrFail($id), 200);
        
-     
+     }
 
     }
 
@@ -122,10 +172,18 @@ class ProductController extends Controller
     public function destroy($identificador)
     {
         //
+             if (!(Product::find($identificador))) {
+        return response()->json([
+             "errors"=> ["code"=> "ERROR-2",
+             "title"=>  "Not found"
+             
+             ]]  , 404);
+        } else{
         $request = Product::findOrFail($identificador);
         $delete = Product::destroy($identificador);
         return response()->json(200);
         //return response()->json(200);
         //return redirect('/');
+    }
     }
 }
