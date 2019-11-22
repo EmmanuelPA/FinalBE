@@ -57,7 +57,7 @@ class ProductTest extends TestCase
         );
      
     }
-      public function test_client_can_create_a_product2()
+      public function test_client_can_create_a_product_without_name()
     {
         // Given
        $productData = [
@@ -83,7 +83,7 @@ class ProductTest extends TestCase
         ]);
  
     }
-     public function test_client_can_create_a_product3()
+     public function test_client_cant_create_a_product_without_price()
     {
         // Given
         $productData = [
@@ -110,7 +110,7 @@ class ProductTest extends TestCase
  
     }
 
-  public function test_client_can_create_a_product4()
+  public function test_client_cant_create_a_product_without_numeric_price()
     {
         // Given
         $productData = [
@@ -136,7 +136,7 @@ class ProductTest extends TestCase
         ]);
  
     }
-     public function test_client_can_create_a_product5()
+     public function test_client_cant_create_a_product_whiout_positive_number()
     {
         // Given
          $productData = [
@@ -197,7 +197,7 @@ public function test_client_can_update_a_product(){
         //print_r(json_encode($primerValor). ' =/= '. json_encode($segundoValor));
         
 }
-public function test_client_can_update_a_product2(){
+public function test_client_cant_update_a_product_whitout_numeric_price(){
        $newProductData = [
             'data' => [
                 'type' => "products",
@@ -217,7 +217,7 @@ public function test_client_can_update_a_product2(){
             
         ]);
 }
-public function test_client_can_update_a_product3(){
+public function test_client_cant_update_a_product_whitout_positive_price(){
    $newProductData = [
             'data' => [
                 'type' => "products",
@@ -238,7 +238,7 @@ public function test_client_can_update_a_product3(){
             
         ]);
 }
-public function test_client_can_update_a_product4(){
+public function test_client_cant_update_a_product_with_wrong_link(){
      $newProductData = [
             'data' => [
                 'type' => "products",
@@ -261,7 +261,7 @@ public function test_client_can_update_a_product4(){
 /**
 *Prueba que valida que se eliminó un artículo correctamente
 **/
-public function test_client_can_delete_a_product3(){
+public function test_client_can_delete_a_product(){
       // Given
     $productData = [
             'data' => [
@@ -291,7 +291,7 @@ public function test_client_can_delete_a_product3(){
             'price' => '23.30'
         ]);
 }
-public function test_client_can_delete_a_product2(){
+public function test_client_cant_delete_a_product_whit_wrong_link(){
         $responseDelete = $this->json('DELETE', '/api/products/' . '33');
            $responseDelete->assertJsonFragment([
             'code' => 'ERROR-2',
@@ -376,7 +376,7 @@ public function test_client_can_delete_a_product2(){
     $response->assertStatus(200); 
 	}
 
-      public function test_client_can_see_a_product2(){
+      public function test_client_cant_see_a_product_whit_wrong_link(){
         $response = $this->json('GET', '/api/products/' . '33');
         $response->assertJsonFragment([
             'code' => 'ERROR-2',
